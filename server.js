@@ -1,11 +1,17 @@
 const express = require('express');
 const app = express();
+const bodyParser = require('body-parser');
 
 const port = process.env.PORT || 3000;
 
 const getTokenRouter = require('./api/routes/getToken');
 const secureRouter = require('./api/routes/secure');
 
+// Configuring body parser
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+// Handling valid endpoints
 app.use('/api/getToken', getTokenRouter);
 app.use('/api/secure', secureRouter);
 

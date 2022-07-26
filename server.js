@@ -4,9 +4,24 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const getTokenRouter = require('./api/routes/getToken');
+const secureRouter = require('./api/routes/secure');
 
 app.use('/api/getToken', getTokenRouter);
+app.use('/api/secure', secureRouter);
 
-app.listen(port, () => {
-    console.log(`Server listening at port ${ port }`)
-})
+// Handling errors
+app.use((req, res, next) => {
+    const error = new Error('Resource not found. Use a valid api endpoint.');
+    error.status = 404;
+    next(error);
+});
+
+app.use((error, req, res, next) => {
+    res.status(error.status || 500).json({
+        error: {
+            message: error.message
+        }
+    });
+});
+
+app.listen(port)

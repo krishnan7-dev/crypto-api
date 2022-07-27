@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const fs = require('fs');
+
 const jwt = require('jsonwebtoken');
 
 // JWT is sent via headers
@@ -8,7 +10,8 @@ const jwt = require('jsonwebtoken');
 // Else send unauthorised error
 
 router.get('/', (req, res, next) => {
-    jwt.verify(req.headers.accesstoken, req.headers.publickey, (error, decoded) => {
+    const publicKey = fs.readFileSync(process.env.PUBLIC_KEY_PATH);
+    jwt.verify(req.headers.accesstoken, publicKey, (error, decoded) => {
         if (decoded) {
             res.status(200).json({
                 message: "You are authorised"

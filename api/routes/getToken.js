@@ -1,28 +1,17 @@
+require('dotenv').config()
+const { request } = require('express');
 const express = require('express');
 const router = express.Router();
 
-const { generateKeyPair, generateKeyPairSync } = require('crypto')
+const fs = require('fs');
+
 const jwt = require('jsonwebtoken');
 
-// Payload can be any object
-// Should return JWT using RS256 algorithm
-
 router.post('/', (req, res, next) => {
-    const { publicKey, privateKey } = generateKeyPairSync('rsa', {
-        modulusLength: 4096,
-        publicKeyEncoding: {
-            type: 'spki',
-            format: 'pem'
-        },
-        privateKeyEncoding: {
-            type: 'pkcs8',
-            format: 'pem'
-        }
-    })
-    const accessToken = jwt.sign({data: 'foo'},  privateKey, { algorithm: 'RS256' });
+    const privateKey = fs.readFileSync(process.env.PRIVATE_KEY_PATH, 'utf-8');
+    const accessToken = jwt.sign({data: req.body.username},  privateKey, { algorithm: 'RS256' });
     res.status(200).json({
         accessToken: accessToken,
-        publicKey: publicKey
     })
 });
 
